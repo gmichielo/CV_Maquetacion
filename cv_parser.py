@@ -262,20 +262,13 @@ def generate_cv_from_template(template_path, cv_json, output_dir="output"):
     replace_placeholders(doc, cv_json_to_docx_data(cv_json))
     doc.save(output_docx)
 
+    # 👉 SOLO convertir a PDF si NO estamos en Linux
     pdf_generated = False
-
-    # 👉 Generar PDF según sistema operativo
-    try:
-        if platform.system().lower() != "linux":
-            # Windows / macOS
+    if platform.system().lower() != "linux":
+        try:
             convert(output_docx, output_pdf)
             pdf_generated = True
-        else:
-            # Linux -> usar pypandoc
-            pypandoc.convert_file(output_docx, 'pdf', outputfile=output_pdf)
-            pdf_generated = True
-    except Exception as e:
-        print(f"PDF conversion failed: {e}")
-        pdf_generated = False
+        except Exception as e:
+            print(f"PDF conversion skipped: {e}")
 
     return output_docx, output_pdf if pdf_generated else None
