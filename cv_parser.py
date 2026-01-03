@@ -3,20 +3,8 @@ from docx import Document
 from docx2pdf import convert
 import re
 import unicodedata
-import json
 import shutil
 import os
-
-PLANTILLA_UNO = r"C:\Users\Gabriel\Documents\CVs Gabriel\Plantilla1.docx"
-PLANTILLA_DOS = r"C:\Users\Gabriel\Documents\CVs Gabriel\Plantilla2.docx"
-PLANTILLA_TRES = r"C:\Users\Gabriel\Documents\CVs Gabriel\Plantilla3.docx"
-
-PLANTILLAS = (PLANTILLA_UNO, PLANTILLA_DOS, PLANTILLA_TRES)
-
-plantilla = ""
-selected_plantilla = "0"
-pdf_original = r"C:\Users\Gabriel\Documents\CVs Gabriel\CV_Gabriel_Michielon (FSa).pdf"
-
 # 1️ UTILIDADES BASE
 
 def normalize_text(text):
@@ -254,10 +242,10 @@ def replace_placeholders(doc, data):
 def generate_cv_from_template(template_path, cv_json, output_dir="output"):
     os.makedirs(output_dir, exist_ok=True)
 
-    output_docx = os.path.join(output_dir, f"CV_FINAL_{cv_json['nombre']}.docx")
-    output_pdf = os.path.join(output_dir, f"CV_FINAL_{cv_json['nombre']}.pdf")
+    safe_name = cv_json["nombre"].replace(" ", "_") or "CV"
+    output_docx = os.path.join(output_dir, f"CV_{safe_name}.docx")
+    output_pdf = os.path.join(output_dir, f"CV_{safe_name}.pdf")
 
-    # Si existen, los borramos
     if os.path.exists(output_docx):
         os.remove(output_docx)
     if os.path.exists(output_pdf):
@@ -272,40 +260,3 @@ def generate_cv_from_template(template_path, cv_json, output_dir="output"):
     convert(output_docx, output_pdf)
 
     return output_docx, output_pdf
-
-def select_plantilla(num_plantilla):
-    if num_plantilla.isnumeric():
-        num_plantilla = int(num_plantilla)
-        if 1 <= num_plantilla <= len(PLANTILLAS):
-            return PLANTILLAS[num_plantilla - 1]
-        else:
-            return None
-    else:
-        return None
-
-
-# 6️ EJECUCIÓN FINAL
-
-if __name__ == "__main__":
-
-    plantilla = None
-
-    while plantilla is None:
-        selected_plantilla = input("Select an option (1-2-3): ")
-        plantilla = select_plantilla(selected_plantilla)
-
-        if plantilla is None:
-            print("\nInvalid option. Please try again.")
-
-    print("\nGenerated CV with Template")
-
-    cv = parse_cv(pdf_original)
-
-    docx_path, pdf_path = generate_cv_from_template(
-        template_path=plantilla,
-        cv_json=cv
-    )
-
-    print(f"CV generado en:\n{docx_path}\n{pdf_path}")
-    print(json.dumps(cv, indent=2, ensure_ascii=False))
-
