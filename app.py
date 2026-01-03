@@ -30,6 +30,8 @@ template_name = st.radio(
     list(TEMPLATES.keys())
 )
 
+st.write("Seleccionaste:", template_name)
+
 # ===============================
 # PROCESAR
 # ===============================
