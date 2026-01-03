@@ -39,7 +39,7 @@ st.write("Seleccionaste:", template_name)
 # PROCESAR
 # ===============================
 
-if uploaded_file and st.button("Generar CV"):
+if uploaded_file and template_name.index != None and st.button("Generar CV"):
     with st.spinner("Procesando CV..."):
         # Guardar PDF temporal
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
