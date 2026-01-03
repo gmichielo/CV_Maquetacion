@@ -1,4 +1,5 @@
 import platform
+import pypandoc
 from PyPDF2 import PdfReader
 from docx import Document
 from docx2pdf import convert
@@ -261,13 +262,20 @@ def generate_cv_from_template(template_path, cv_json, output_dir="output"):
     replace_placeholders(doc, cv_json_to_docx_data(cv_json))
     doc.save(output_docx)
 
-    # 👉 SOLO convertir a PDF si NO estamos en Linux
     pdf_generated = False
-    if platform.system().lower() != "linux":
-        try:
+
+    # 👉 Generar PDF según sistema operativo
+    try:
+        if platform.system().lower() != "linux":
+            # Windows / macOS
             convert(output_docx, output_pdf)
             pdf_generated = True
-        except Exception as e:
-            print(f"PDF conversion skipped: {e}")
+        else:
+            # Linux -> usar pypandoc
+            pypandoc.convert_file(output_docx, 'pdf', outputfile=output_pdf)
+            pdf_generated = True
+    except Exception as e:
+        print(f"PDF conversion failed: {e}")
+        pdf_generated = False
 
     return output_docx, output_pdf if pdf_generated else None
