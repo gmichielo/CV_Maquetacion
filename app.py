@@ -27,7 +27,8 @@ uploaded_file = st.file_uploader("Sube tu CV (PDF)", type=["pdf"])
 
 template_name = st.radio(
     "Selecciona una plantilla",
-    list(TEMPLATES.keys())
+    list(TEMPLATES.keys()),
+    index=None,
 )
 
 st.write("Seleccionaste:", template_name)
