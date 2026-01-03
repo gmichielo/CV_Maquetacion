@@ -66,10 +66,13 @@ if uploaded_file and st.button("Generar CV"):
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             )
 
-        with open(output_pdf, "rb") as f:
-            st.download_button(
-                "⬇ Descargar PDF",
-                f,
-                file_name=os.path.basename(output_pdf),
-                mime="application/pdf"
-            )
+        if output_pdf and os.path.exists(output_pdf):
+            with open(output_pdf, "rb") as f:
+                st.download_button(
+                    "⬇ Descargar PDF",
+                    f,
+                    file_name=os.path.basename(output_pdf),
+                    mime="application/pdf"
+                )
+        else:
+            st.warning("⚠️ El PDF no pudo generarse en este entorno.")
