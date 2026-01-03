@@ -1,12 +1,10 @@
 from PyPDF2 import PdfReader
 from docx import Document
 from docx2pdf import convert
-import os
-import subprocess
 import re
 import unicodedata
 import shutil
-
+import os
 # 1️ UTILIDADES BASE
 
 def normalize_text(text):
@@ -241,15 +239,6 @@ def replace_placeholders(doc, data):
                     replace_in_paragraph(p)
 
 
-def convert_docx_to_pdf_linux(input_docx, output_pdf):
-    subprocess.run([
-        "libreoffice",
-        "--headless",
-        "--convert-to", "pdf",
-        "--outdir", os.path.dirname(output_pdf),
-        input_docx
-    ], check=True)
-
 def generate_cv_from_template(template_path, cv_json, output_dir="output"):
     os.makedirs(output_dir, exist_ok=True)
 
@@ -257,18 +246,27 @@ def generate_cv_from_template(template_path, cv_json, output_dir="output"):
     output_docx = os.path.join(output_dir, f"CV_{safe_name}.docx")
     output_pdf = os.path.join(output_dir, f"CV_{safe_name}.pdf")
 
+    # Limpieza previa
     if os.path.exists(output_docx):
         os.remove(output_docx)
     if os.path.exists(output_pdf):
         os.remove(output_pdf)
 
+    # Copiar plantilla
     shutil.copy(template_path, output_docx)
 
+    # Rellenar DOCX
     doc = Document(output_docx)
     replace_placeholders(doc, cv_json_to_docx_data(cv_json))
     doc.save(output_docx)
 
-    # Conversión a PDF usando LibreOffice en Linux
-    convert_docx_to_pdf_linux(output_docx, output_pdf)
+    # 👉 SOLO convertir a PDF si NO estamos en Linux
+    pdf_generated = False
+    if platform.system().lower() != "linux":
+        try:
+            convert(output_docx, output_pdf)
+            pdf_generated = True
+        except Exception as e:
+            print(f"PDF conversion skipped: {e}")
 
-    return output_docx, output_pdf
+    return output_docx, output_pdf if pdf_generated else None
