@@ -27,19 +27,25 @@ uploaded_file = st.file_uploader("Sube tu CV (PDF)", type=["pdf"])
 
 st.write("Selecciona una plantilla")
 
+# Estado único
+if "template_selected" not in st.session_state:
+    st.session_state.template_selected = None
+
 cols = st.columns(len(TEMPLATES))
-template_name = None
 
 for col, name in zip(cols, TEMPLATES.keys()):
     with col:
-        selected = st.radio(
-            label="",
-            options=[name],
-            key=f"tpl_{name}"
-        )
-        if selected:
-            template_name = name
-st.write("Seleccionaste:", template_name)
+        if st.button(
+            name,
+            use_container_width=True,
+            type="primary" if st.session_state.template_selected == name else "secondary"
+        ):
+            st.session_state.template_selected = name
+
+template_name = st.session_state.template_selected
+
+if template_name:
+    st.markdown(f"**Seleccionaste:** {template_name}")
 
 # ===============================
 # PROCESAR
