@@ -43,7 +43,7 @@ if uploaded_file and st.button("Generar CV"):
 
         # Mostrar JSON
         st.subheader("📄 Datos detectados")
-        st.json(cv_json)
+        #st.json(cv_json)
 
         # Generar CV final
         output_docx, output_pdf = generate_cv_from_template(
