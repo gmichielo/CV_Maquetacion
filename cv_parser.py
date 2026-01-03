@@ -1,3 +1,4 @@
+import platform
 from PyPDF2 import PdfReader
 from docx import Document
 from docx2pdf import convert
