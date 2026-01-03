@@ -28,18 +28,18 @@ uploaded_file = st.file_uploader("Sube tu CV (PDF)", type=["pdf"])
 # Radio para seleccionar plantilla
 template_name = st.radio(
     "Selecciona una plantilla",
-    ["--Selecciona--"] + list(TEMPLATES.keys()),  # Agregamos opción por defecto
+    ["--Ninguna--"] + list(TEMPLATES.keys()),  # Agregamos opción por defecto
     index=0
 )
 
 # Mostrar selección
-if template_name != "--Selecciona--":
+if template_name != "--Ninguna--":
     st.write("Seleccionaste:", template_name)
 else:
     st.warning("⚠️ Por favor, selecciona una plantilla antes de generar el CV.")
 
 # Mostrar botón solo si hay archivo y plantilla válida
-if uploaded_file and template_name != "--Selecciona--":
+if uploaded_file and template_name != "--Ninguna--":
     if st.button("Generar CV"):
         with st.spinner("Procesando CV..."):
             # Guardar PDF temporal
