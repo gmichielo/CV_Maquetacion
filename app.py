@@ -35,12 +35,11 @@ cols = st.columns(len(TEMPLATES))
 
 for col, name in zip(cols, TEMPLATES.keys()):
     with col:
-        if st.button(
-            name,
-            use_container_width=True,
-            type="primary" if st.session_state.template_selected == name else "secondary"
-        ):
+        # Definimos el tipo según si está seleccionado
+        button_type = "primary" if st.session_state.template_selected == name else "secondary"
+        if st.button(TEMPLATES[name], use_container_width=True, type=button_type, key=name):
             st.session_state.template_selected = name
+            st.experimental_rerun()  # Esto fuerza que el botón se actualice inmediatamente
 
 template_name = st.session_state.template_selected
 
