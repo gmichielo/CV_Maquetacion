@@ -25,62 +25,62 @@ st.write("Sube tu CV, elige una plantilla y genera un nuevo CV automáticamente.
 
 uploaded_file = st.file_uploader("Sube tu CV (PDF)", type=["pdf"])
 
-cols = st.columns(len(TEMPLATES))
-
+# Radio para seleccionar plantilla
 template_name = st.radio(
     "Selecciona una plantilla",
-    list(TEMPLATES.keys()),
-    index=None,
+    ["--Selecciona--"] + list(TEMPLATES.keys()),  # Agregamos opción por defecto
+    index=0
 )
 
-st.write("Seleccionaste:", template_name)
+# Mostrar selección
+if template_name != "--Selecciona--":
+    st.write("Seleccionaste:", template_name)
+else:
+    st.warning("⚠️ Por favor, selecciona una plantilla antes de generar el CV.")
 
-# ===============================
-# PROCESAR
-# ===============================
+# Mostrar botón solo si hay archivo y plantilla válida
+if uploaded_file and template_name != "--Selecciona--":
+    if st.button("Generar CV"):
+        with st.spinner("Procesando CV..."):
+            # Guardar PDF temporal
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                tmp.write(uploaded_file.read())
+                pdf_path = tmp.name
 
-if uploaded_file and template_name.index != None and st.button("Generar CV"):
-    with st.spinner("Procesando CV..."):
-        # Guardar PDF temporal
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            tmp.write(uploaded_file.read())
-            pdf_path = tmp.name
+            # Parsear CV
+            cv_json = parse_cv(pdf_path)
 
-        # Parsear CV
-        cv_json = parse_cv(pdf_path)
+            # Mostrar JSON
+            st.subheader("📄 Datos detectados")
+            # st.json(cv_json)
 
-        # Mostrar JSON
-        st.subheader("📄 Datos detectados")
-        #st.json(cv_json)
-
-        # Generar CV final
-        output_docx, output_pdf = generate_cv_from_template(
-            template_path=TEMPLATES[template_name],
-            cv_json=cv_json,
-            output_dir="output"
-        )
-
-        st.success("CV generado correctamente")
-
-        # ===============================
-        # DESCARGAS
-        # ===============================
-
-        with open(output_docx, "rb") as f:
-            st.download_button(
-                "⬇ Descargar DOCX",
-                f,
-                file_name=os.path.basename(output_docx),
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            # Generar CV final
+            output_docx, output_pdf = generate_cv_from_template(
+                template_path=TEMPLATES[template_name],
+                cv_json=cv_json,
+                output_dir="output"
             )
 
-        if output_pdf and os.path.exists(output_pdf):
-            with open(output_pdf, "rb") as f:
+            st.success("CV generado correctamente")
+
+            # ===============================
+            # DESCARGAS
+            # ===============================
+            with open(output_docx, "rb") as f:
                 st.download_button(
-                    "⬇ Descargar PDF",
+                    "⬇ Descargar DOCX",
                     f,
-                    file_name=os.path.basename(output_pdf),
-                    mime="application/pdf"
+                    file_name=os.path.basename(output_docx),
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 )
-        else:
-            st.warning("⚠️ El PDF no pudo generarse en este entorno.")
+
+            if output_pdf and os.path.exists(output_pdf):
+                with open(output_pdf, "rb") as f:
+                    st.download_button(
+                        "⬇ Descargar PDF",
+                        f,
+                        file_name=os.path.basename(output_pdf),
+                        mime="application/pdf"
+                    )
+            else:
+                st.warning("⚠️ El PDF no pudo generarse en este entorno.")
