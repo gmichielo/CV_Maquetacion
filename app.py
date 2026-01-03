@@ -25,12 +25,20 @@ st.write("Sube tu CV, elige una plantilla y genera un nuevo CV automáticamente.
 
 uploaded_file = st.file_uploader("Sube tu CV (PDF)", type=["pdf"])
 
-template_name = st.radio(
-    "Selecciona una plantilla",
-    list(TEMPLATES.keys()),
-    index=None,
-)
+st.write("Selecciona una plantilla")
 
+cols = st.columns(len(TEMPLATES))
+template_name = None
+
+for col, name in zip(cols, TEMPLATES.keys()):
+    with col:
+        selected = st.radio(
+            label="",
+            options=[name],
+            key=f"tpl_{name}"
+        )
+        if selected:
+            template_name = name
 st.write("Seleccionaste:", template_name)
 
 # ===============================
