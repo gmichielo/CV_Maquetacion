@@ -1,10 +1,12 @@
 from PyPDF2 import PdfReader
 from docx import Document
 from docx2pdf import convert
+import os
+import subprocess
 import re
 import unicodedata
 import shutil
-import os
+
 # 1️ UTILIDADES BASE
 
 def normalize_text(text):
@@ -239,6 +241,15 @@ def replace_placeholders(doc, data):
                     replace_in_paragraph(p)
 
 
+def convert_docx_to_pdf_linux(input_docx, output_pdf):
+    subprocess.run([
+        "libreoffice",
+        "--headless",
+        "--convert-to", "pdf",
+        "--outdir", os.path.dirname(output_pdf),
+        input_docx
+    ], check=True)
+
 def generate_cv_from_template(template_path, cv_json, output_dir="output"):
     os.makedirs(output_dir, exist_ok=True)
 
@@ -257,6 +268,7 @@ def generate_cv_from_template(template_path, cv_json, output_dir="output"):
     replace_placeholders(doc, cv_json_to_docx_data(cv_json))
     doc.save(output_docx)
 
-    convert(output_docx, output_pdf)
+    # Conversión a PDF usando LibreOffice en Linux
+    convert_docx_to_pdf_linux(output_docx, output_pdf)
 
     return output_docx, output_pdf
